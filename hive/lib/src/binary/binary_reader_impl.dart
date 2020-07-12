@@ -207,10 +207,26 @@ class BinaryReaderImpl extends BinaryReader {
   @override
   Map readMap([int length]) {
     length ??= readUint32();
+    final keyId = readByte();
     var map = <dynamic, dynamic>{};
-    for (var i = 0; i < length; i++) {
-      map[read()] = read();
+    if (keyId == FrameValueType.intT) {
+      map = <int, dynamic>{};
     }
+    if (keyId == FrameValueType.stringT) {
+      map = <String, dynamic>{};
+    }
+    for (var i = 0; i < length; i++) {
+      final key = read(keyId);
+      final valueId = readByte();
+      final value = read(valueId);
+      map[key] = value;
+
+      // assuming keyId will not change
+      // and Map has keys of consistent type
+      // just flush next keyId:
+      if (i < length - 1) final _ = readByte();
+    }
+
     return map;
   }
 
