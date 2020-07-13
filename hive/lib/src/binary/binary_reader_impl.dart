@@ -206,11 +206,10 @@ class BinaryReaderImpl extends BinaryReader {
 
   @override
   Map readMap([int length]) {
-    var map = <dynamic, dynamic>{};
-
     length ??= readUint32();
-    if (length < 1) return map;
+    if (length < 1) return null;
 
+    Map map;
     final keyType = readByte();
     if (keyType == FrameValueType.intT) {
       map = <int, dynamic>{};
